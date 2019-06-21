@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nankai.dao.ProductStatisticsDao">
+
+	<!-- 目的：为DAO接口方法提供sql语句配置 -->
+	
+	
+ 	
+ 	<!--查找某年某类农产品中各重金属极值和平均值  -->
+ 	<!-- $符号：将参数直接拼接在SQL语句中。#：采用预编译处理。 -->
+ 	<select id="selectproEleExtre" parameterType="map" resultType="java.util.Map">
+ 		
+		SELECT  s.`year`,p.`name`,pe.element_id,CAST(MAX(elecontent+0) AS DECIMAL(10,3)) as max,CAST(MIN(elecontent+0) AS DECIMAL(10,3)) as min,CAST(AVG( elecontent+0) AS DECIMAL(10,3)) as avg FROM
+				section s join  product p
+				on s.product_id=p.id
+				join product_element pe 
+				on p.id=pe.product_id
+				where p.`name`${proScope} and s.`year`=#{year}
+				GROUP BY pe.element_id
+ 	</select>
+ 	
+ 	<!--某年某区域的某类农产品的  测量区块数量（点位数） -->
+ 	<!-- $符号：将参数直接拼接在SQL语句中。#：采用预编译处理。 -->
+ 	<!-- 强转时使用varchar不正确，不知道为啥。 -->
+ 	<select id="selectproScnCount" parameterType="map" resultType="java.util.Map">
+ 		
+		select s.year,s.region_id,p.`name`,COUNT(*) as 'count'  from 
+		section s join product p 
+		ON s.product_id=p.id
+		WHERE p.`name`${proScope} and s.`year`=#{year}
+		GROUP BY p.`name`,region_id
+ 	</select>
+ 	
+ 	<!--某年某区域每种种农产品中某元素的超标点位 -->
+ 	<select id="selectOverProofSection" parameterType="map" resultType="EleOverProof">
+ 		
+		SELECT year,sectionID,CAST(region_id AS CHAR(20)) as regionID,name,EleNum,
+			CAST(elecontent AS DECIMAL(6,3)) as elecontent,topline 
+			from ${table} where year=#{year} and elecontent>topline	
+
+ 	</select>
+ 	
+ 	
+ 	<!--选出某种元素带有单因子指数的点位数据 -->
+ 	<select id="selectDataWithPn" parameterType="map" resultType="EleOverProof">
+ 		
+		SELECT year,sectionID,region_id as regionID,name,EleNum,elecontent+0 as elecontent,
+			CAST(elecontent/topline AS DECIMAL(6,3)) as pn 
+			from ${table} where year=#{year}
+
+ 	</select>
+ 	
+ 	
+ 	
+	
+</mapper>

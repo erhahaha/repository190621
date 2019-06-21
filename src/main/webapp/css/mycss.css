@@ -1,0 +1,16 @@
+.data-title, .choose{
+	float: left;
+	padding: 10px;
+	padding: 10px;
+}
+.choose{
+	margin-top: 10px;
+	font-family: SimHei,"Î¢ÈíÑÅºÚ",sans-serif;
+	font :16px
+}
+
+.main-left, .main-right{
+	float: left;
+	padding: 10px;
+	padding: 10px;
+}

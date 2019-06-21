@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nankai.dao.SettingDao">
+	<select id="findranges"  parameterType="int"  resultType="java.lang.String">
+		select `range` from standardrange where kind=#{kind} order by CAST(`range` as decimal) asc
+	</select>
+
+	<select id="kindofelem"  parameterType="map"  resultType="java.lang.String">
+		select distinct elemkind from
+		standard where kind=#{kind} and elem=#{elem}
+	</select>
+
+	<select id="selectStandard"  parameterType="map"  resultType="java.lang.String">
+		select standard from
+		standard WHERE kind=#{kind} AND elem=#{elem} and elemkind=#{elemkind} 
+		order by CAST(`range` as decimal) asc
+	</select>
+	
+	<select id="findelements" resultType="java.lang.String">
+		select name from element limit 8
+	</select>
+</mapper>

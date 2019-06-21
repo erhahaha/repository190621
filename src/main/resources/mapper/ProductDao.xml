@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nankai.dao.ProductDao">
+
+	<resultMap type="com.nankai.bean.Section" id="proOfregionmap">
+		<id property="id" column="id"/>
+		<result property="year" column="year"/>
+		<result property="region_id" column="region_id"/>
+		<association property="product" javaType="com.nankai.bean.Product">
+			<result property="name" column="name"/>
+		</association>
+	</resultMap> 
+
+	<!-- 目的：为DAO接口方法提供sql语句配置 -->
+	
+	<!-- 增加农作物记录 -->
+ 	<insert id="insertProductInfo" parameterType="com.nankai.bean.Product" useGeneratedKeys="true"  keyProperty="id" > 
+	    insert into product(number,name) 
+	    values
+	    (#{number},#{name});
+ 	</insert> 
+ 	<!-- 增加农作物元素关联表记录 -->
+ 	<insert id="insertProduct_elementInfo" parameterType="map" > 
+	    insert into product_element(product_id,element_id,elecontent) 
+	    values
+	    (#{product_id},#{element_id},#{elecontent});
+ 	</insert> 
+ 	
+ 	 <!--查询某年某区域选取了哪些农作物作为样本  -->
+ 	<select id="selectproductOfRegion" parameterType="map" resultMap="proOfregionmap">
+ 		select DISTINCT s.year,s.region_id,s.id,group_concat(distinct p.name) as name
+			from product p join section s on p.id=s.product_id
+			where s.year=#{year} and s.region_id=(select id from region r where name=#{regionName})
+			group by p.name
+ 	</select> 
+ 	
+ 	
+ 	<!--查询某年某区域农作物中某元素的最大值  -->
+ 	<select id="selectproductElemax" parameterType="map" resultType="java.util.Map">
+ 		select elecontent as maxcontent,p.name as nameOfmax
+	from product_element pe join product p on pe.product_id=p.id
+													join section s on p.id=s.product_id
+		
+	where s.year=#{year} and pe.element_id=#{eleid} and s.region_id=(select id from region r where name=#{regionName})
+	order by elecontent+0 desc
+  	limit 1
+ 	</select>
+ 	<!--查询某年某区域农作物中某元素的最小值  -->
+ 	<select id="selectproductElemin" parameterType="map" resultType="java.util.Map">
+ 		select elecontent as mincontent,p.name as nameOfmin
+	from product_element pe join product p on pe.product_id=p.id
+													join section s on p.id=s.product_id
+		
+	where s.year=#{year} and pe.element_id=#{eleid} and s.region_id=(select id from region r where name=#{regionName})
+	order by elecontent+0 asc
+  	limit 1
+ 	</select>
+ 	<!--查询某年某区域农作物中某元素的平均值  -->
+ 	<select id="selectproductEleavg" parameterType="map" resultType="java.util.Map">
+ 		select avg(pe.elecontent+0) as avgcontent
+			from product_element pe join product p on pe.product_id=p.id
+									join section s on p.id=s.product_id
+			where s.`year`=#{year} and pe.element_id=#{eleid} and s.region_id=(select id from region r where `name`=#{regionName})
+ 	</select>
+	
+		<select id="selectProductInfo" parameterType="map" resultType="BasicInfo">
+		select
+		sectionNumber,Cproduct,ElemCd,ElemHg,ElemAs,ElemCu,ElemPb,ElemCr,ElemZn,ElemNi
+		from productInfo
+		where year=#{year} and name=#{regionName} 
+	</select>
+	
+</mapper>	

@@ -1,0 +1,56 @@
+<html>
+<head>
+  <p style="font-size: 20px;color: red;">使用a标签方式将json导出csv文件</p>
+  <button onclick='tableToExcel()'>导出</button>
+</head>
+<body>
+  <script>
+            
+    function tableToExcel(){
+      //要导出的json数据
+      /* var jsonData = [
+        {
+          name:'路人甲',
+          phone:'123456789',
+          email:'000@123456.com'
+        },
+        {
+          name:'炮灰乙',
+          phone:'123456789',
+          email:'000@123456.com'
+        },
+        {
+          name:'土匪丙',
+          phone:'123456789',
+          email:'000@123456.com'
+        },
+        {
+          name:'流氓丁',
+          phone:'123456789',
+          email:'000@123456.com'
+        },
+      ] */
+      //列标题，逗号隔开，每一个逗号就是隔开一个单元格
+      let str = `地区,土壤编号,年份,东经,北纬,土壤Cd镉(mg/kg),土壤Pb铅(mg/kg),土壤Cr铬(mg/kg),土壤As砷(mg/kg),土壤Hg汞(mg/kg),土壤Cu铜(mg/kg),土壤Zn锌(mg/kg),土壤Ni镍(mg/kg)`;
+      str+=`pH,阳离子交换量(cmol/kg),有机质,编号,作物名称,农产品铜(mg/kg),农产品锌(mg/kg),农产品铅(mg/kg),农产品镉(mg/kg),农产品汞(mg/kg),农产品砷(mg/kg),农产品铬(mg/kg),农产品镍(mg/kg)`;
+      //增加\t为了不让表格显示科学计数法或者其他格式
+      /* for(let i = 0 ; i < jsonData.length ; i++ ){
+        for(let item in jsonData[i]){
+            str+=`${jsonData[i][item] + '\t'},`;     
+        }
+        str+='\n';
+      } */
+      //encodeURIComponent解决中文乱码
+      let uri = 'data:text/csv;charset=utf-8,\ufeff' + encodeURIComponent(str);
+      //通过创建a标签实现
+      var link = document.createElement("a");
+      link.href = uri;
+      //对下载的文件命名
+      link.download =  "样品表.xls";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+</script>
+</body>
+</html>

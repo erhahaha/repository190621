@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nankai.dao.SectionDao">
+	<!-- <resultMap type="Section" id="regionEleMap"> <result property="year" 
+		column="year"/> <association property="region"> <result property="name" column="regionName"/> 
+		</association> <collection property="elementList" ofType="Element"> <result 
+		property="name" column="eleName"/> </collection> </resultMap> -->
+
+	<!-- 目的：为DAO接口方法提供sql语句配置 -->
+
+	<!-- 增加农作物记录 -->
+ 	<insert id="insertSectionInfo" parameterType="com.nankai.bean.Section" useGeneratedKeys="true" keyProperty="id" > 
+	    insert into section(number,year,longitude,latitude,towns,region_id,product_id) 
+	    values
+	    (#{number},#{year},#{longitude},#{latitude},#{towns},#{region_id},#{product_id});
+ 	</insert> 
+ 	<!-- 增加农作物元素关联表记录 -->
+ 	<insert id="insertSection_elementInfo" parameterType="map"> 
+	    insert into section_element(section_id,element_id,elecontent) 
+	    values
+	    (#{section_id},#{element_id},#{elecontent});
+ 	</insert> 
+
+	<!--查询某区域某重金属含量 -->
+	<select id="selectEleContentOfRegion" parameterType="map"
+		resultType="EleofsectionWithrg">
+		select
+		regionName,sectionNumber,year,latitude,longitude,eleName,elecontent
+		from element_of_section_with_region
+		where year=#{year} and
+		regionName=#{regionName} and eleName=#{eleName}
+	</select>
+
+	<select id="selectInfoOfRegion" parameterType="map"
+		resultType="EleofsectionWithrg">
+		select
+		regionName,sectionNumber,year,eleName,elecontent
+		from
+		element_of_section_with_region
+		where year=#{year} and
+		regionName=#{regionName}
+	</select>
+
+	<!--查询某年某区域某重金属含量最大值，最小值，平均值 -->
+	<select id="selectEleStatisOfRegion" parameterType="map"
+		resultType="java.util.Map">
+		select maxcontent,mincontent,avgcontent,eleName
+		from
+		elementMinMaxAvg_of_region
+		where year=#{year} and
+		regionName=#{regionName} and eleName=#{eleName}
+	</select>
+
+	<select id="selectElemOfRegion" parameterType="map"
+		resultType="EleminmaxavgOfregion">
+		select maxcontent,mincontent,avgcontent,eleName
+		from
+		elementMinMaxAvg_of_region
+		where year=#{year} and
+		regionName=#{regionName} and eleName=#{eleName}
+	</select>
+	
+	<select id="selectElemOfAll" parameterType="map"
+		resultType="EleminmaxavgOfregion">
+		select maxcontent,mincontent,avgcontent,eleName
+		from
+		elementMinMaxAvg_of_all
+		where year=#{year} and eleName=#{eleName}
+	</select>
+
+	<!--查询这些年某区域某重金属含量最大值，最小值，平均值 -->
+	<select id="selectEleStatisOfRegionforyears" parameterType="map"
+		resultType="EleminmaxavgOfregion">
+		select
+		year,regionName,eleName,avgcontent,maxcontent,mincontent
+		from
+		elementminmaxavg_of_region
+		where eleName=#{eleName} and
+		regionName=#{regionName}
+	</select>
+	
+	<!--查询这些年某区域某重金属含量最大值，最小值，平均值 -->
+	<select id="selectEleAllOfRegionforyears" parameterType="map"
+		resultType="EleminmaxavgOfregion">
+		select
+		year,eleName,avgcontent,maxcontent,mincontent
+		from
+		elementminmaxavg_of_all
+		where eleName=#{eleName}
+	</select>
+
+	<!--查询某年所有区域某重金属的平均值 -->
+	<select id="selectAvgOfeleyear" parameterType="map" resultType="java.lang.String">
+		select avgcontent from elementminmaxavg_of_region where
+		eleName=#{eleName} and year = #{year} order by regionName
+	</select>
+
+	<select id="samplepoints" parameterType="map" resultType="int">
+		select
+		count(distinct sectionNumber) from element_of_section_with_region
+		where year=#{year} and regionName=#{regionName}
+	</select>
+
+	<select id="findregions" resultType="java.lang.String">
+		select name from region
+	</select>
+
+	<select id="findyears" resultType="int">
+		select distinct year from
+		section order by year asc
+	</select>
+
+	<select id="findelements" resultType="java.lang.String">
+		select name from element
+		limit 8
+	</select>
+
+	<select id="overproofpoints" resultType="java.lang.String">
+		select amount from
+		region_anal
+		where year=#{year} and regionName=#{regionName} and
+		elemName=#{elemName} and way=#{way} and level=#{level}
+	</select>
+
+	<select id="selectAllSectionInfo" parameterType="map"
+		resultType="BasicInfo">
+		select
+		ElemCd,ElemHg,ElemAs,ElemCu,ElemPb,ElemCr,ElemZn,ElemNi,ElemPH,Cproduct
+		from
+		section_product
+		where year=#{year} and regionName=#{regionName}
+	</select>
+
+	<insert id="insertAnalInfo" parameterType="map">
+		insert into
+		region_anal
+		(year,regionName,elemName,way,level,amount)
+		values
+		(#{year},#{regionName},#{elemName},#{way},#{level},#{amount});
+	</insert>
+	
+	<select id="findproductids" resultType="int" parameterType="int">
+		select product_id from
+		section where year=#{year}
+	</select>
+	
+	<delete id="deleteproduct" parameterType="int">
+		delete from product where id=#{id};
+	</delete> 
+	
+	<delete id="deleteregionanal" parameterType="int">
+		delete from region_anal where year=#{year};
+	</delete> 
+</mapper>	
